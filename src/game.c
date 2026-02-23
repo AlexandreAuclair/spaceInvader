@@ -19,9 +19,23 @@ void update(){
 }
 
 void render(){
-    int i;
+    
+    memset(buffer,0,0x4000);
+    
 
-    i = translate_position(234, 96);
-    draw_pixel(i, 0xFF);
 
+
+    //draw
+    draw_square(object.x,object.y,32,32,2);
+
+    if(object.x < 288)
+        object.x++;
+    
+    if (object.y < 168)
+    {
+        object.y++;
+    }
+    
+    
+    _fmemcpy(CGA,buffer,0x4000);
 }

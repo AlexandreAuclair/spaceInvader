@@ -16,6 +16,8 @@ typedef unsigned char  byte;
 typedef unsigned short word;
 typedef unsigned long  dword;
 
+extern byte *buffer;
+
 byte far *CGA       = (byte *)0xB8000000L;       /* this points to video memory. */
 
 //  Sets the video mode by calling the CPU interrupt VIDEO
@@ -26,6 +28,13 @@ void set_mode(byte mode);
 word translate_position(int x, int y);
 
 //  draw pixel on screen
-void draw_pixel(int index, byte color);
+void draw_pixel(word index, byte color);
+
+//  Translate the postion x,y to a 16-bit address and put it on screen
+void put_pixel(int x, int y, byte color);
+
+// draw square on screen
+void draw_square(int x, int y, int w, int h, byte color);
+
 
 #endif

@@ -23,7 +23,7 @@ void set_mode(byte mode)
 //  Translate the postion x,y to a 16-bit address
 //  return address
 word translate_position(int x, int y){
-    int offset;
+    word offset;
     offset = (y / 2) * 80 + (x / 4);
     if (y % 2)
         offset += 0x2000;
@@ -31,14 +31,15 @@ word translate_position(int x, int y){
 }
 
 //  draw pixel on screen
-void draw_pixel(int index, byte color){
-    CGA[index] = color;
+void draw_pixel(word index, byte color){
+    buffer[index] = color;
 }
 
-void put_pixel(int x, int y, unsigned char color)
+//  Translate the postion x,y to a 16-bit address and put it on screen
+void put_pixel(int x, int y, byte color)
 {
-    unsigned int offset;
-    unsigned char mask;
+    word offset;
+    byte mask;
 
     offset = (y / 2) * 80 + (x / 4);
 
@@ -47,6 +48,17 @@ void put_pixel(int x, int y, unsigned char color)
 
     mask = 0xC0 >> ((x & 3) * 2);
 
-    CGA[offset] &= ~mask;
-    CGA[offset] |= (color << (6 - (x & 3) * 2));
+    buffer[offset] &= ~mask;
+    buffer[offset] |= (color << (6 - (x & 3) * 2));
+}
+
+// draw square on screen
+void draw_square(int x, int y, int w, int h, byte color){
+    int i,j;
+
+    for(i=0;i<w;i++){
+        for(j=0;j<h;j++){
+            put_pixel(x+i, y+j, color);
+        }
+    }
 }
