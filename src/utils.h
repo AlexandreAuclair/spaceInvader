@@ -36,5 +36,7 @@ void put_pixel(int x, int y, byte color);
 // draw square on screen
 void draw_square(int x, int y, int w, int h, byte color);
 
+// draw sprite on screen
+void draw_sprite(int x, int y, int w, int h, byte *sprite);
 
 #endif

@@ -62,3 +62,23 @@ void draw_square(int x, int y, int w, int h, byte color){
         }
     }
 }
+
+// draw read sprite and draw it on screen
+void draw_sprite(int x, int y, int w, int h, byte *sprite){
+    int i;
+    byte c1,c2,c3,c4;
+
+    for(i=0;i<(h*(w/4));i++){
+        c1 = (sprite[i] & 0xC0) >> 6;
+        c2 = (sprite[i] & 0x30) >> 4;
+        c3 = (sprite[i] & 0x0C) >> 2;
+        c4 = sprite[i] & 0x03;
+
+        put_pixel(x+((i%(w/4))*4), y+i/(w/4), c1);
+        put_pixel(x+((i%(w/4))*4)+1, y+i/(w/4), c2);
+        put_pixel(x+((i%(w/4))*4)+2, y+i/(w/4), c3);
+        put_pixel(x+((i%(w/4))*4)+3, y+i/(w/4), c4);
+        
+    }
+}
+
