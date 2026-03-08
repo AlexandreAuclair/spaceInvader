@@ -8,12 +8,18 @@
 
 #include "utils.h"
 #include "object.h"
+#include "sprite.h"
 
 extern byte *buffer;
+extern Sprite *mage;
+extern Sprite *smiley;
+extern byte far *CGA;
 
-void input(int* is_running);
+void setupGame();
 
-void update();
+void input(int *is_running);
+
+void update(int *i);
 
 void render();
 

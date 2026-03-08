@@ -1,5 +1,7 @@
 #include "utils.h"
 
+byte far *CGA       = (byte *)0xB8000000L;       /* this points to video memory. */
+
 //  Sets the video mode by calling the CPU interrupt VIDEO
 void set_mode(byte mode)
 {
@@ -64,21 +66,26 @@ void draw_square(int x, int y, int w, int h, byte color){
 }
 
 // draw read sprite and draw it on screen
-void draw_sprite(int x, int y, int w, int h, byte *sprite){
+void draw_sprite(int x, int y, Sprite *sprite){
     int i;
     byte c1,c2,c3,c4;
+    byte offset;
 
-    for(i=0;i<(h*(w/4));i++){
-        c1 = (sprite[i] & 0xC0) >> 6;
-        c2 = (sprite[i] & 0x30) >> 4;
-        c3 = (sprite[i] & 0x0C) >> 2;
-        c4 = sprite[i] & 0x03;
+    if(sprite->anim == 1)
+        offset = sprite->size;
+    else
+        offset = 0;
 
-        put_pixel(x+((i%(w/4))*4), y+i/(w/4), c1);
-        put_pixel(x+((i%(w/4))*4)+1, y+i/(w/4), c2);
-        put_pixel(x+((i%(w/4))*4)+2, y+i/(w/4), c3);
-        put_pixel(x+((i%(w/4))*4)+3, y+i/(w/4), c4);
-        
+    for(i=0;i<(sprite->height*(sprite->width/4));i++){
+        c1 = (sprite->data[i+offset] & 0xC0) >> 6;
+        c2 = (sprite->data[i+offset] & 0x30) >> 4;
+        c3 = (sprite->data[i+offset] & 0x0C) >> 2;
+        c4 = sprite->data[i+offset] & 0x03;
+
+        put_pixel(x+((i%(sprite->width/4))*4), y+i/(sprite->width/4), c1);
+        put_pixel(x+((i%(sprite->width/4))*4)+1, y+i/(sprite->width/4), c2);
+        put_pixel(x+((i%(sprite->width/4))*4)+2, y+i/(sprite->width/4), c3);
+        put_pixel(x+((i%(sprite->width/4))*4)+3, y+i/(sprite->width/4), c4);
     }
 }
 

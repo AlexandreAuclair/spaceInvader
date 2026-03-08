@@ -1,6 +1,9 @@
 #include "game.h"
 
 byte *buffer;
+SpritePack *pack;
+Sprite *mage;
+Sprite *smiley;
 
 void setup(){
     set_mode(CGA_4_COLOR_MODE);
@@ -10,6 +13,14 @@ void setup(){
 	    printf("Error: Failed to allocate memory for double buffer.\n");
 	    return;
     }
+
+    pack = open_sprite_pack("sprites.spr");
+
+    mage = load_sprite(pack, 1);
+    smiley = load_sprite(pack, 0);
+
+    setupGame();
+
 }
 
 int main(void) {
@@ -21,8 +32,8 @@ int main(void) {
     i = 0;
     while(is_running){
         input(&is_running);
-        update();
-        render(i);
+        update(&i);
+        render();
         i++;
     }
 
