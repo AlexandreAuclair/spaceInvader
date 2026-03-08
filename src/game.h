@@ -19,7 +19,7 @@ void setupGame();
 
 void input(int *is_running);
 
-void update(int *i);
+void update(int *i, int *f);
 
 void render();
 

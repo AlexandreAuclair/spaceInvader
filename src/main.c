@@ -24,17 +24,19 @@ void setup(){
 }
 
 int main(void) {
-    int is_running,i;
+    int is_running,i,f;
 
     setup();
 
     is_running = 1;
     i = 0;
+    f = 0;
     while(is_running){
         input(&is_running);
-        update(&i);
+        update(&i,&f);
         render();
         i++;
+        f++;
     }
 
     free(buffer);

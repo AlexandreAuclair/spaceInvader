@@ -4,8 +4,10 @@ int kc;
 int alienWidthMin;
 int alienWidthMax;
 int way;
+int way2;
 Object player;
 Object *aliens;
+Object spaceship;
 
 const byte alien1[] = {
     0x04, 0x00, 0x40,
@@ -35,7 +37,7 @@ const byte alien2[] = {
     0x15, 0x55, 0x40,
     0x01, 0x04, 0x00,
     0x04, 0x51, 0x00,
-    0x41, 0x04, 0x40,
+    0x11, 0x04, 0x40,
 
     0x00, 0x50, 0x00,
     0x01, 0x54, 0x00,
@@ -78,25 +80,40 @@ const byte playerData[] = {
     0x00, 0x00, 0x00
 };
 
+const byte spaceshipData[] = {
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x2A, 0xA8, 0x00,
+    0x02, 0xAA, 0xAA, 0x80,
+    0x0A, 0xAA, 0xAA, 0xA0,
+    0x28, 0xA2, 0x8A, 0x28,
+    0xAA, 0xAA, 0xAA, 0xAA,
+    0x0A, 0x82, 0x82, 0xA0,
+    0x02, 0x00, 0x00, 0x80
+};
+
 void setupGame() {
     int i;
-    Sprite playerSpr = {12,8,24, playerData, 0};
-    Sprite alienSpr1 = {12,8,24, alien1, 0};
-    Sprite alienSpr2 = {12,8,24, alien2, 0};
-    Sprite alienSpr3 = {12,8,24, alien3, 0};
+    Sprite playerSpr = {12, 8, 24, playerData, 0};
+    Sprite alienSpr1 = {12, 8, 24, alien1, 0};
+    Sprite alienSpr2 = {12, 8, 24, alien2, 0};
+    Sprite alienSpr3 = {12, 8, 24, alien3, 0};
+    Sprite spaceshipSpr = {16, 8, 32, spaceshipData, 0};
     int startX = 32;
     int startY = 20;
     int spacingX = 20;
     int spacingY = 20;
     int cols = 12;
 
-    alienWidthMin = 16;
+    alienWidthMin = 24;
     alienWidthMax = 252;
     way = 1;
 
     player.x = 160;
     player.y = 160;
     player.sprite = playerSpr;
+    spaceship.x = -1;
+    spaceship.y = 8;
+    spaceship.sprite = spaceshipSpr;
 
     if ((aliens = (Sprite *)malloc(60)) == NULL) {
         printf("Error : no memory for alien sprite");
@@ -125,10 +142,10 @@ void input(int* is_running){
     }
 }
 
-void update(int *i){
+void update(int *i, int *f){
     int j;
     
-    if(*i == 5) {
+    if(*i == 6) {
         *i = 0;
         if(way == 1){
             alienWidthMax += 8;
@@ -137,7 +154,7 @@ void update(int *i){
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
                 if(alienWidthMax > 308){
                     way = 0;
-                    aliens[j].x -= 8;
+                    aliens[j].y += 8;
                 }
                 else{
                     aliens[j].x += 8;
@@ -151,15 +168,30 @@ void update(int *i){
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
                 if(alienWidthMin < 0){
                     way = 1;
-                    aliens[j].x += 8;
+                    aliens[j].y += 8;
                 }
                 else{
                     aliens[j].x -= 8;
                 }
             }
         }
+    }
 
-        
+    if(*f > 1){
+        if(way2 == 1 && spaceship.x < 320)
+            spaceship.x++;
+        else if(spaceship.x > 320){
+            *f = 0;
+            way2 = 0;
+        }
+
+
+        if(way2 == 0 && spaceship.x > -16)
+            spaceship.x--;
+        else if(spaceship.x < 0){
+            *f = 0;
+            way2 = 1;
+        }
     }
 }
 
@@ -173,6 +205,8 @@ void render(){
     for(i = 0; i < 60; i++){
         draw_sprite(aliens[i].x, aliens[i].y, &aliens[i].sprite);
     }
+
+    draw_sprite(spaceship.x, spaceship.y, &spaceship.sprite);
     
     _fmemcpy(CGA,buffer,0x4000);
 }

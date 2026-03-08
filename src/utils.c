@@ -71,6 +71,12 @@ void draw_sprite(int x, int y, Sprite *sprite){
     byte c1,c2,c3,c4;
     byte offset;
 
+    if(x < 0 || x > 320)
+        return;
+    if(y < 0 || y > 200)
+        return;
+            
+
     if(sprite->anim == 1)
         offset = sprite->size;
     else
@@ -82,6 +88,7 @@ void draw_sprite(int x, int y, Sprite *sprite){
         c3 = (sprite->data[i+offset] & 0x0C) >> 2;
         c4 = sprite->data[i+offset] & 0x03;
 
+        
         put_pixel(x+((i%(sprite->width/4))*4), y+i/(sprite->width/4), c1);
         put_pixel(x+((i%(sprite->width/4))*4)+1, y+i/(sprite->width/4), c2);
         put_pixel(x+((i%(sprite->width/4))*4)+2, y+i/(sprite->width/4), c3);
