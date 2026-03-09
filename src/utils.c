@@ -96,3 +96,45 @@ void draw_sprite(int x, int y, Sprite *sprite){
     }
 }
 
+// draw read sprite and draw it on screen
+void draw_sprite_fast(int x, int y, Sprite *sprite){
+    int i,j;
+    byte c;
+    byte offset;
+    word address;
+
+    address = (y / 2) * 80 + (x / 4);
+
+        if (y & 1){
+            address += 0x2000;
+            c = 1;
+        }
+
+    if(x < 0 || x > 320)
+        return;
+    if(y < 0 || y > 200)
+        return;
+            
+
+    if(sprite->anim == 1)
+        offset = sprite->size;
+    else
+        offset = 0;
+
+    for(i=0;i<sprite->height;i++){      
+        for(j=0;j<sprite->width/4;j++){
+            buffer[address + j] =
+                sprite->data[(i*(sprite->width/4)) + j + offset];
+        }
+        if(c == 1){
+            address -= 0x2000;
+            address += 80;
+            c =0;
+        }
+        else {
+            address += 0x2000;
+            c = 1;
+        }
+
+    }
+}

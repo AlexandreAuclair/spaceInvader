@@ -39,6 +39,7 @@ int main(void) {
         f++;
     }
 
+    unset_keyboard();
     free(buffer);
     set_mode(TEXT_MODE);
     return 0;

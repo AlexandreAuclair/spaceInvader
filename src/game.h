@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "object.h"
 #include "sprite.h"
+#include "KEYBOARD.H"
 
 extern byte *buffer;
 extern Sprite *mage;

@@ -26,4 +26,6 @@ void draw_square(int x, int y, int w, int h, byte color);
 // draw sprite on screen
 void draw_sprite(int x, int y, Sprite *sprite);
 
+void draw_sprite_fast(int x, int y, Sprite *sprite);
+
 #endif

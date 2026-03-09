@@ -1,13 +1,14 @@
 #include "game.h"
 
-int kc;
 int alienWidthMin;
 int alienWidthMax;
+int alienNum;
 int way;
 int way2;
 Object player;
 Object *aliens;
 Object spaceship;
+byte *keys;
 
 const byte alien1[] = {
     0x04, 0x00, 0x40,
@@ -107,15 +108,16 @@ void setupGame() {
     alienWidthMin = 24;
     alienWidthMax = 252;
     way = 1;
+    alienNum = 60;
 
     player.x = 160;
     player.y = 160;
     player.sprite = playerSpr;
     spaceship.x = -1;
-    spaceship.y = 8;
+    spaceship.y = 16;
     spaceship.sprite = spaceshipSpr;
 
-    if ((aliens = (Sprite *)malloc(60)) == NULL) {
+    if ((aliens = (Sprite *)malloc(alienNum)) == NULL) {
         printf("Error : no memory for alien sprite");
         return;
     }
@@ -131,21 +133,28 @@ void setupGame() {
         aliens[i].x = startX + (i % cols) * spacingX;
         aliens[i].y = startY + (i / cols) * spacingY;
     }
+
+    keys = set_keyboard();
 }
 
 void input(int* is_running){
-    if(kbhit()) 
-        kc = getch();
-
-    if(kc == 27){
+    if(keys[KEY_ESC] == 1){
         *is_running = 0;
+    }
+
+    if(keys[KEY_KEYPAD_4] == 1) {
+        player.x--;
+    }
+
+    if(keys[KEY_KEYPAD_6] == 1) {
+        player.x++;
     }
 }
 
 void update(int *i, int *f){
     int j;
     
-    if(*i == 6) {
+    if(*i == 15) {
         *i = 0;
         if(way == 1){
             alienWidthMax += 8;
@@ -200,13 +209,14 @@ void render(){
     memset(buffer,0,0x4000);
 
     //draw
-    draw_sprite(player.x, player.y, &player.sprite);
+    draw_sprite_fast(player.x, player.y, &player.sprite);
 
-    for(i = 0; i < 60; i++){
-        draw_sprite(aliens[i].x, aliens[i].y, &aliens[i].sprite);
+    for(i = 0; i < alienNum; i++){
+        draw_sprite_fast(aliens[i].x, aliens[i].y, &aliens[i].sprite);
     }
 
-    draw_sprite(spaceship.x, spaceship.y, &spaceship.sprite);
+    draw_sprite_fast(spaceship.x, spaceship.y, &spaceship.sprite);
+
     
     _fmemcpy(CGA,buffer,0x4000);
 }
