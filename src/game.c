@@ -8,7 +8,14 @@ int way2;
 Object player;
 Object *aliens;
 Object spaceship;
+Object playerBullet;
+Object scoreTxt[4];
 byte *keys;
+
+
+
+int score;
+int shoot;
 
 const byte alien1[] = {
     0x04, 0x00, 0x40,
@@ -36,18 +43,18 @@ const byte alien2[] = {
     0x05, 0x55, 0x00,
     0x14, 0x51, 0x40,
     0x15, 0x55, 0x40,
-    0x01, 0x04, 0x00,
     0x04, 0x51, 0x00,
-    0x11, 0x04, 0x40,
-
+    0x10, 0x00, 0x40,
+    0x04, 0x01, 0x00,
+    
     0x00, 0x50, 0x00,
     0x01, 0x54, 0x00,
     0x05, 0x55, 0x00,
     0x14, 0x51, 0x40,
     0x15, 0x55, 0x40,
+    0x01, 0x04, 0x00,
     0x04, 0x51, 0x00,
-    0x10, 0x00, 0x40,
-    0x04, 0x01, 0x00,
+    0x11, 0x04, 0x40,
 };
 
 const byte alien3[] = {
@@ -56,18 +63,18 @@ const byte alien3[] = {
     0x55, 0x55, 0x55,
     0x54, 0x14, 0x15,
     0x55, 0x55, 0x55,
-    0x01, 0x41, 0x40,
-    0x05, 0x14, 0x50,
-    0x50, 0x00, 0x05,
+    0x05, 0x41, 0x50,
+    0x14, 0x14, 0x14,
+    0x05, 0x00, 0x50,
 
     0x00, 0x55, 0x00,
     0x15, 0x55, 0x54,
     0x55, 0x55, 0x55,
     0x54, 0x14, 0x15,
     0x55, 0x55, 0x55,
-    0x05, 0x41, 0x50,
-    0x14, 0x14, 0x14,
-    0x05, 0x00, 0x50,
+    0x01, 0x41, 0x40,
+    0x05, 0x14, 0x50,
+    0x50, 0x00, 0x05,
 };
 
 const byte playerData[] = {
@@ -89,8 +96,115 @@ const byte spaceshipData[] = {
     0x28, 0xA2, 0x8A, 0x28,
     0xAA, 0xAA, 0xAA, 0xAA,
     0x0A, 0x82, 0x82, 0xA0,
-    0x02, 0x00, 0x00, 0x80
+    0x02, 0x00, 0x00, 0x80,
 };
+
+const byte text[] = {
+    0x0F,0xF0, 0x0F,0xF0, 0x0F,0xF0, 0x3F,0xF0, 0x3F,0xFC,
+    0x30,0x0C, 0x30,0x0C, 0x30,0x0C, 0x30,0x0C, 0x30,0x00,
+    0x30,0x00, 0x30,0x00, 0x30,0x0C, 0x30,0x0C, 0x30,0x00,
+    0x0F,0xF0, 0x30,0x00, 0x30,0x0C, 0x3F,0xF0, 0x3F,0xF0,
+    0x00,0x0C, 0x30,0x00, 0x30,0x0C, 0x30,0xC0, 0x30,0x00,
+    0x30,0x0C, 0x30,0x0C, 0x30,0x0C, 0x30,0x30, 0x30,0x00,
+    0x0F,0xF0, 0x0F,0xF0, 0x0F,0xF0, 0x30,0x0C, 0x3F,0xFC,
+};
+
+const byte number0[] = {
+    0x0F,0xC0,
+    0x30,0x30,
+    0x30,0xF0,
+    0x33,0x30,
+    0x3C,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+};
+const byte number1[] = {
+    0x03,0x00,
+    0x0F,0x00,
+    0x03,0x00,
+    0x03,0x00,
+    0x03,0x00,
+    0x03,0x00,
+    0x0F,0xC0,
+};
+const byte number2[] = {
+    0x0F,0xC0,
+    0x30,0x30,
+    0x00,0x30,
+    0x03,0xC0,
+    0x0C,0x00,
+    0x30,0x00,
+    0x3F,0xF0,
+};
+const byte number3[] = {
+    0x3F,0xF0,
+    0x00,0x30,
+    0x00,0xC0,
+    0x03,0xC0,
+    0x00,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+};
+const byte number4[] = {
+    0x00,0xC0,
+    0x03,0xC0,
+    0x0C,0xC0,
+    0x30,0xC0,
+    0x3F,0xF0,
+    0x00,0xC0,
+    0x00,0xC0,
+};
+const byte number5[] = {
+    0x3F,0xF0,
+    0x30,0x00,
+    0x3F,0xC0,
+    0x00,0x30,
+    0x00,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+};
+const byte number6[] = {
+    0x03,0xF0,
+    0x0C,0x00,
+    0x30,0x00,
+    0x3F,0xC0,
+    0x3C,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+};
+const byte number7[] = {
+    0x3F,0xF0,
+    0x00,0x30,
+    0x00,0xC0,
+    0x03,0x00,
+    0x0C,0x00,
+    0x0C,0x00,
+    0x0C,0x00,
+};
+const byte number8[] = {
+    0x0F,0xC0,
+    0x30,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+    0x30,0x30,
+    0x30,0x30,
+    0x0F,0xC0,
+};
+const byte number9[] = {
+    0x0F,0xC0,
+    0x30,0x30,
+    0x30,0x30,
+    0x0F,0xF0,
+    0x00,0x30,
+    0x00,0xC0,
+    0x3F,0x00,
+};
+
+
+Sprite textSpr = {40, 7, 70, text, 0};
+
+
+
 
 void setupGame() {
     int i;
@@ -99,14 +213,25 @@ void setupGame() {
     Sprite alienSpr2 = {12, 8, 24, alien2, 0};
     Sprite alienSpr3 = {12, 8, 24, alien3, 0};
     Sprite spaceshipSpr = {16, 8, 32, spaceshipData, 0};
+    Sprite Spr0 = {8,7, 14, number0, 0};
+    Sprite Spr1 = {8,7, 14, number1, 0};
+    Sprite Spr2 = {8,7, 14, number2, 0};
+    Sprite Spr3 = {8,7, 14, number3, 0};
+    Sprite Spr4 = {8,7, 14, number4, 0};
+    Sprite Spr5 = {8,7, 14, number5, 0};
+    Sprite Spr6 = {8,7, 14, number6, 0};
+    Sprite Spr7 = {8,7, 14, number7, 0};
+    Sprite Spr8 = {8,7, 14, number8, 0};
+    Sprite Spr9 = {8,7, 14, number9, 0};
+
     int startX = 32;
     int startY = 20;
-    int spacingX = 20;
+    int spacingX = 16;
     int spacingY = 20;
     int cols = 12;
 
-    alienWidthMin = 24;
-    alienWidthMax = 252;
+    alienWidthMin = startX;
+    alienWidthMax = startX + (11*spacingX);
     way = 1;
     alienNum = 60;
 
@@ -116,8 +241,9 @@ void setupGame() {
     spaceship.x = -1;
     spaceship.y = 16;
     spaceship.sprite = spaceshipSpr;
+    playerBullet.dead = 1;
 
-    if ((aliens = (Sprite *)malloc(alienNum)) == NULL) {
+    if ((aliens = (Object *)malloc(60)) == NULL) {
         printf("Error : no memory for alien sprite");
         return;
     }
@@ -132,7 +258,11 @@ void setupGame() {
 
         aliens[i].x = startX + (i % cols) * spacingX;
         aliens[i].y = startY + (i / cols) * spacingY;
+        aliens[i].dead = 0;
     }
+
+    for(i=0;i<4;i++)
+        scoreTxt[i].sprite = Spr0;
 
     keys = set_keyboard();
 }
@@ -149,17 +279,33 @@ void input(int* is_running){
     if(keys[KEY_KEYPAD_6] == 1) {
         player.x++;
     }
+
+    if(keys[KEY_SPACE] == 1 && shoot == 0 && playerBullet.dead == 1) {
+        shoot = 1;
+        playerBullet.x = player.x+5;
+        playerBullet.y = player.y-4;
+        playerBullet.dead = 0;
+    }
+    else if (keys[KEY_SPACE] == 0 && playerBullet.dead == 1) {
+        shoot = 0;
+    }
+
 }
 
 void update(int *i, int *f){
-    int j;
+    int j, left, right;
     
-    if(*i == 15) {
+
+    // manage alien movement group
+    if(*i >= alienNum) {
         *i = 0;
         if(way == 1){
             alienWidthMax += 8;
             alienWidthMin += 8;
             for(j = 0; j < 60; j++){
+                if(aliens[j].dead == 1)
+                    continue;
+
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
                 if(alienWidthMax > 308){
                     way = 0;
@@ -167,29 +313,49 @@ void update(int *i, int *f){
                 }
                 else{
                     aliens[j].x += 8;
-                }
+                }     
             }
+            
         }
         else {
             alienWidthMax -= 8;
             alienWidthMin -= 8;
             for(j = 0; j < 60; j++){
+                if(aliens[j].dead == 1)
+                    continue;
+
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
-                if(alienWidthMin < 0){
+                if(alienWidthMin < 8){
                     way = 1;
                     aliens[j].y += 8;
                 }
                 else{
                     aliens[j].x -= 8;
                 }
+
+            }
+        }
+
+        left = find_leftmost(12, 5, aliens);
+        if(left != -1){
+            if(alienWidthMin < aliens[left].x){
+                alienWidthMin = aliens[left].x;
+            }
+        }
+        
+        right = find_rightmost(12, 5, aliens);
+        if(right != -1){
+            if(alienWidthMax > aliens[right].x){
+                alienWidthMax = aliens[right].x;
             }
         }
     }
 
-    if(*f > 1){
-        if(way2 == 1 && spaceship.x < 320)
+    // manage spaceship movement
+    if(*f >= 5){
+        if(way2 == 1 && spaceship.x < 336)
             spaceship.x++;
-        else if(spaceship.x > 320){
+        else if(spaceship.x > 336){
             *f = 0;
             way2 = 0;
         }
@@ -197,9 +363,28 @@ void update(int *i, int *f){
 
         if(way2 == 0 && spaceship.x > -16)
             spaceship.x--;
-        else if(spaceship.x < 0){
+        else if(spaceship.x < -16){
             *f = 0;
             way2 = 1;
+        }
+    }
+
+    // manage player movement & collision with aliens
+    if(shoot == 1 && playerBullet.dead == 0) {
+        playerBullet.y-=4;
+        for(j = 0; j < 60; j++){
+            if(aliens[j].dead == 0 && 
+                playerBullet.y > aliens[j].y &&
+                playerBullet.y < (aliens[j].y+8) && 
+                playerBullet.x > aliens[j].x &&
+                playerBullet.x < (aliens[j].x+12)){
+                    playerBullet.dead = 1;
+                    aliens[j].dead = 1;
+                    alienNum--;
+            }
+        }
+        if(playerBullet.y < 0){
+            playerBullet.dead = 1;
         }
     }
 }
@@ -209,13 +394,23 @@ void render(){
     memset(buffer,0,0x4000);
 
     //draw
+    draw_sprite(8,2,&textSpr);
+
+    for(i=0;i<4;i++)
+        draw_sprite(58+(i*8), 2, &scoreTxt[i].sprite);
+
     draw_sprite_fast(player.x, player.y, &player.sprite);
 
-    for(i = 0; i < alienNum; i++){
-        draw_sprite_fast(aliens[i].x, aliens[i].y, &aliens[i].sprite);
+    for(i = 0; i < 60; i++){
+        if(aliens[i].dead == 0)
+            draw_sprite_fast(aliens[i].x, aliens[i].y, &aliens[i].sprite);
     }
 
     draw_sprite_fast(spaceship.x, spaceship.y, &spaceship.sprite);
+
+    if(shoot == 1){
+        draw_square(playerBullet.x, playerBullet.y, 1, 4, 3);
+    }
 
     
     _fmemcpy(CGA,buffer,0x4000);

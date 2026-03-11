@@ -4,6 +4,7 @@
 #include <dos.h>
 #include "globals.h"
 #include "sprite.h"
+#include "object.h"
 
 extern byte *buffer;
 
@@ -27,5 +28,11 @@ void draw_square(int x, int y, int w, int h, byte color);
 void draw_sprite(int x, int y, Sprite *sprite);
 
 void draw_sprite_fast(int x, int y, Sprite *sprite);
+
+// finding the leftmost element in a array of object
+int find_leftmost(int cols, int rows, Object *array);
+
+// finding the rightmost element in a array of object
+int find_rightmost(int cols, int rows, Object *array);
 
 #endif

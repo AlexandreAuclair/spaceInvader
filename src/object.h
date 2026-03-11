@@ -7,6 +7,7 @@ typedef struct {
     int x;
     int y;
     Sprite sprite;
+    byte dead;
 }Object;
 
 #endif

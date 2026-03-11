@@ -138,3 +138,30 @@ void draw_sprite_fast(int x, int y, Sprite *sprite){
 
     }
 }
+
+
+// finding the leftmost element in a array of object
+int find_leftmost(int cols, int rows, Object *array)
+{
+    int r,c;
+
+    for(c=0;c<cols;c++)
+        for(r=0;r<rows;r++)
+            if(array[r*cols+c].dead == 0)
+                return c;
+
+    return -1;
+}
+
+// finding the rightmost element in a array of object
+int find_rightmost(int cols, int rows, Object *array)
+{
+    int r,c;
+
+    for(c=cols-1;c>=0;c--)
+        for(r=0;r<rows;r++)
+            if(array[r*cols+c].dead == 0)
+                return c;
+
+    return -1;
+}
