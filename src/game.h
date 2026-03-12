@@ -20,7 +20,7 @@ void setupGame();
 
 void input(int *is_running);
 
-void update(int *i, int *f);
+void update(int *i, int *f, int *a);
 
 void render();
 

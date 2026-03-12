@@ -9,11 +9,9 @@ Object player;
 Object *aliens;
 Object spaceship;
 Object playerBullet;
-Object scoreTxt[4];
+Object scoreTxt[3];
 byte *keys;
-
-
-
+Object alienBullet;
 int score;
 int shoot;
 
@@ -168,7 +166,7 @@ const byte number6[] = {
     0x0C,0x00,
     0x30,0x00,
     0x3F,0xC0,
-    0x3C,0x30,
+    0x30,0x30,
     0x30,0x30,
     0x0F,0xC0,
 };
@@ -202,8 +200,16 @@ const byte number9[] = {
 
 
 Sprite textSpr = {40, 7, 70, text, 0};
-
-
+Sprite Spr0 = {8,7, 14, number0, 0};
+Sprite Spr1 = {8,7, 14, number1, 0};
+Sprite Spr2 = {8,7, 14, number2, 0};
+Sprite Spr3 = {8,7, 14, number3, 0};
+Sprite Spr4 = {8,7, 14, number4, 0};
+Sprite Spr5 = {8,7, 14, number5, 0};
+Sprite Spr6 = {8,7, 14, number6, 0};
+Sprite Spr7 = {8,7, 14, number7, 0};
+Sprite Spr8 = {8,7, 14, number8, 0};
+Sprite Spr9 = {8,7, 14, number9, 0};
 
 
 void setupGame() {
@@ -213,16 +219,6 @@ void setupGame() {
     Sprite alienSpr2 = {12, 8, 24, alien2, 0};
     Sprite alienSpr3 = {12, 8, 24, alien3, 0};
     Sprite spaceshipSpr = {16, 8, 32, spaceshipData, 0};
-    Sprite Spr0 = {8,7, 14, number0, 0};
-    Sprite Spr1 = {8,7, 14, number1, 0};
-    Sprite Spr2 = {8,7, 14, number2, 0};
-    Sprite Spr3 = {8,7, 14, number3, 0};
-    Sprite Spr4 = {8,7, 14, number4, 0};
-    Sprite Spr5 = {8,7, 14, number5, 0};
-    Sprite Spr6 = {8,7, 14, number6, 0};
-    Sprite Spr7 = {8,7, 14, number7, 0};
-    Sprite Spr8 = {8,7, 14, number8, 0};
-    Sprite Spr9 = {8,7, 14, number9, 0};
 
     int startX = 32;
     int startY = 20;
@@ -242,6 +238,7 @@ void setupGame() {
     spaceship.y = 16;
     spaceship.sprite = spaceshipSpr;
     playerBullet.dead = 1;
+    alienBullet.dead = 1;
 
     if ((aliens = (Object *)malloc(60)) == NULL) {
         printf("Error : no memory for alien sprite");
@@ -261,7 +258,7 @@ void setupGame() {
         aliens[i].dead = 0;
     }
 
-    for(i=0;i<4;i++)
+    for(i=0;i<3;i++)
         scoreTxt[i].sprite = Spr0;
 
     keys = set_keyboard();
@@ -272,12 +269,15 @@ void input(int* is_running){
         *is_running = 0;
     }
 
+    if(player.dead == 1)
+        return;
+
     if(keys[KEY_KEYPAD_4] == 1) {
-        player.x--;
+        player.x-=2;
     }
 
     if(keys[KEY_KEYPAD_6] == 1) {
-        player.x++;
+        player.x+=2;
     }
 
     if(keys[KEY_SPACE] == 1 && shoot == 0 && playerBullet.dead == 1) {
@@ -292,8 +292,8 @@ void input(int* is_running){
 
 }
 
-void update(int *i, int *f){
-    int j, left, right;
+void update(int *i, int *f, int *a){
+    int j, left, right, r;
     
 
     // manage alien movement group
@@ -371,7 +371,7 @@ void update(int *i, int *f){
 
     // manage player movement & collision with aliens
     if(shoot == 1 && playerBullet.dead == 0) {
-        playerBullet.y-=4;
+        playerBullet.y-=5;
         for(j = 0; j < 60; j++){
             if(aliens[j].dead == 0 && 
                 playerBullet.y > aliens[j].y &&
@@ -381,10 +381,147 @@ void update(int *i, int *f){
                     playerBullet.dead = 1;
                     aliens[j].dead = 1;
                     alienNum--;
+                    if(j > 36){
+                        score++;
+                    }else if(j > 12)
+                        score += 2;
+                    else
+                        score += 3;
             }
         }
         if(playerBullet.y < 0){
             playerBullet.dead = 1;
+        }
+    }
+
+    switch (score % 10)
+    {
+    case 0:
+        scoreTxt[2].sprite = Spr0;
+        break;
+    case 1:
+        scoreTxt[2].sprite = Spr1;
+        break;
+    case 2:
+        scoreTxt[2].sprite = Spr2;
+        break;
+    case 3:
+        scoreTxt[2].sprite = Spr3;
+        break;
+    case 4:
+        scoreTxt[2].sprite = Spr4;
+        break;
+    case 5:
+        scoreTxt[2].sprite = Spr5;
+        break;
+    case 6:
+        scoreTxt[2].sprite = Spr6;
+        break;
+    case 7:
+        scoreTxt[2].sprite = Spr7;
+        break;
+    case 8:
+        scoreTxt[2].sprite = Spr8;
+        break;
+    case 9:
+        scoreTxt[2].sprite = Spr9;
+        break;
+    }
+
+    switch ((score/10) % 10)
+    {
+    case 0:
+        scoreTxt[1].sprite = Spr0;
+        break;
+    case 1:
+        scoreTxt[1].sprite = Spr1;
+        break;
+    case 2:
+        scoreTxt[1].sprite = Spr2;
+        break;
+    case 3:
+        scoreTxt[1].sprite = Spr3;
+        break;
+    case 4:
+        scoreTxt[1].sprite = Spr4;
+        break;
+    case 5:
+        scoreTxt[1].sprite = Spr5;
+        break;
+    case 6:
+        scoreTxt[1].sprite = Spr6;
+        break;
+    case 7:
+        scoreTxt[1].sprite = Spr7;
+        break;
+    case 8:
+        scoreTxt[1].sprite = Spr8;
+        break;
+    case 9:
+        scoreTxt[1].sprite = Spr9;
+        break;
+    }
+
+    switch ((score/100) % 10)
+    {
+    case 0:
+        scoreTxt[0].sprite = Spr0;
+        break;
+    case 1:
+        scoreTxt[0].sprite = Spr1;
+        break;
+    case 2:
+        scoreTxt[0].sprite = Spr2;
+        break;
+    case 3:
+        scoreTxt[0].sprite = Spr3;
+        break;
+    case 4:
+        scoreTxt[0].sprite = Spr4;
+        break;
+    case 5:
+        scoreTxt[0].sprite = Spr5;
+        break;
+    case 6:
+        scoreTxt[0].sprite = Spr6;
+        break;
+    case 7:
+        scoreTxt[0].sprite = Spr7;
+        break;
+    case 8:
+        scoreTxt[0].sprite = Spr8;
+        break;
+    case 9:
+        scoreTxt[0].sprite = Spr9;
+        break;
+    }
+
+    if(*a > 10 && alienBullet.dead == 1){
+        r = alienWidthMin + rand() % alienWidthMax;
+        *a = 0;
+        alienBullet.y = aliens[59].y;
+        alienBullet.dead = 0;
+        alienBullet.x = r;
+    }
+    else if(*a > 10){
+        *a = 0;
+    }
+
+    if(alienBullet.dead == 0){
+        alienBullet.y+=5;
+        if(player.dead == 0 && 
+           alienBullet.y > player.y &&
+           alienBullet.y < (player.y+8) && 
+           alienBullet.x > player.x &&
+           alienBullet.x < (player.x+12)){
+                    player.dead = 1;
+                    alienBullet.dead = 1;
+                    
+                    
+            }
+
+        if(alienBullet.y > 200){
+            alienBullet.dead = 1;
         }
     }
 }
@@ -396,10 +533,13 @@ void render(){
     //draw
     draw_sprite(8,2,&textSpr);
 
-    for(i=0;i<4;i++)
+    for(i=0;i<3;i++)
         draw_sprite(58+(i*8), 2, &scoreTxt[i].sprite);
 
-    draw_sprite_fast(player.x, player.y, &player.sprite);
+    draw_sprite(82, 2, &Spr0);
+
+    if(player.dead == 0)
+        draw_sprite_fast(player.x, player.y, &player.sprite);
 
     for(i = 0; i < 60; i++){
         if(aliens[i].dead == 0)
@@ -408,8 +548,12 @@ void render(){
 
     draw_sprite_fast(spaceship.x, spaceship.y, &spaceship.sprite);
 
-    if(shoot == 1){
+    if(shoot == 1 && playerBullet.dead == 0){
         draw_square(playerBullet.x, playerBullet.y, 1, 4, 3);
+    }
+
+    if(alienBullet.dead == 0){
+        draw_square(alienBullet.x, alienBullet.y, 1, 4, 2);
     }
 
     

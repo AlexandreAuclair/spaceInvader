@@ -19,24 +19,28 @@ void setup(){
     mage = load_sprite(pack, 1);
     smiley = load_sprite(pack, 0);
 
+    srand((unsigned)time(NULL));
+
     setupGame();
 
 }
 
 int main(void) {
-    int is_running,i,f;
+    int is_running,i,f,a;
 
     setup();
 
     is_running = 1;
     i = 0;
     f = 0;
+    a = 0;
     while(is_running){
         input(&is_running);
-        update(&i,&f);
+        update(&i,&f,&a);
         render();
         i++;
         f++;
+        a++;
     }
 
     unset_keyboard();
