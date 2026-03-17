@@ -5,13 +5,20 @@ int alienWidthMax;
 int alienNum;
 int way;
 int way2;
+
 Object player;
 Object *aliens;
 Object spaceship;
 Object playerBullet;
 Object scoreTxt[3];
-byte *keys;
 Object alienBullet;
+Object LifeTxt;
+Object playerLife;
+Object gameOver;
+Object defense[4];
+
+byte *keys;
+byte life;
 int score;
 int shoot;
 
@@ -197,6 +204,24 @@ const byte number9[] = {
     0x00,0xC0,
     0x3F,0x00,
 };
+const byte defenseData[] = {
+    0x00,0x3F, 0xFF,0xFF, 0xC0,0x00,
+    0x00,0xFF, 0xFF,0xFF, 0xF0,0x00,
+    0x03,0xFF, 0xFF,0xFF, 0xFC,0x00,
+    0x0F,0xFF, 0xFF,0xFF, 0xFF,0x00,
+    0x3F,0xFF, 0xFF,0xFF, 0xFF,0xC0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFF, 0xFF,0xFF, 0xFF,0xF0,
+    0xFF,0xFC, 0x00,0x03, 0xFF,0xF0,
+    0xFF,0xF0, 0x00,0x00, 0xFF,0xF0,
+    0xFF,0xC0, 0x00,0x00, 0x3F,0xF0,
+    0xFF,0xC0, 0x00,0x00, 0x3F,0xF0,
+};
 
 
 Sprite textSpr = {40, 7, 70, text, 0};
@@ -219,36 +244,44 @@ void setupGame() {
     Sprite alienSpr2 = {12, 8, 24, alien2, 0};
     Sprite alienSpr3 = {12, 8, 24, alien3, 0};
     Sprite spaceshipSpr = {16, 8, 32, spaceshipData, 0};
+    Sprite defenseSpr = {24,16,96, defenseData};
 
-    int startX = 32;
+    int startX = 85;
     int startY = 20;
     int spacingX = 16;
-    int spacingY = 20;
-    int cols = 12;
+    int spacingY = 12;
+    int cols = 11;
 
     alienWidthMin = startX;
-    alienWidthMax = startX + (11*spacingX);
-    way = 1;
-    alienNum = 60;
+    alienWidthMax = startX + (10*spacingX);
+    way = 0;
+    alienNum = 55;
 
     player.x = 160;
-    player.y = 160;
+    player.y = 180;
     player.sprite = playerSpr;
     spaceship.x = -1;
     spaceship.y = 16;
     spaceship.sprite = spaceshipSpr;
     playerBullet.dead = 1;
     alienBullet.dead = 1;
+    playerLife.sprite = playerSpr;
+    playerLife.x = 28;
+    playerLife.y = 192;
+    life = 3;
+    LifeTxt.x = 20;
+    LifeTxt.y = 192;
+    gameOver.dead = 1;
 
-    if ((aliens = (Object *)malloc(60)) == NULL) {
+    if ((aliens = (Object *)malloc(55)) == NULL) {
         printf("Error : no memory for alien sprite");
         return;
     }
 
-    for(i = 0; i < 60; i++){
-        if(i < 12)
+    for(i = 0; i < 55; i++){
+        if(i < 11)
             aliens[i].sprite = alienSpr2;
-        else if(i < 36)
+        else if(i < 33)
             aliens[i].sprite = alienSpr1;
         else
             aliens[i].sprite = alienSpr3;
@@ -256,6 +289,13 @@ void setupGame() {
         aliens[i].x = startX + (i % cols) * spacingX;
         aliens[i].y = startY + (i / cols) * spacingY;
         aliens[i].dead = 0;
+    }
+
+    for(i = 0; i < 4; i++){
+        defense[i].y = 160;
+        defense[i].x = 56 + (i*spacingX*4);
+        defense[i].dead = 0;
+        defense[i].sprite = defenseSpr;
     }
 
     for(i=0;i<3;i++)
@@ -273,11 +313,11 @@ void input(int* is_running){
         return;
 
     if(keys[KEY_KEYPAD_4] == 1) {
-        player.x-=2;
+        player.x--;
     }
 
     if(keys[KEY_KEYPAD_6] == 1) {
-        player.x+=2;
+        player.x++;
     }
 
     if(keys[KEY_SPACE] == 1 && shoot == 0 && playerBullet.dead == 1) {
@@ -297,17 +337,26 @@ void update(int *i, int *f, int *a){
     
 
     // manage alien movement group
+    
     if(*i >= alienNum) {
         *i = 0;
+        if(player.dead && life > 0){
+            player.dead = 0;
+            life--;
+        }
+        else if(player.dead){
+            gameOver.dead = 0;
+        }
+
         if(way == 1){
             alienWidthMax += 8;
             alienWidthMin += 8;
-            for(j = 0; j < 60; j++){
+            for(j = 0; j < 55; j++){
                 if(aliens[j].dead == 1)
                     continue;
 
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
-                if(alienWidthMax > 308){
+                if(alienWidthMax > 264){
                     way = 0;
                     aliens[j].y += 8;
                 }
@@ -320,12 +369,12 @@ void update(int *i, int *f, int *a){
         else {
             alienWidthMax -= 8;
             alienWidthMin -= 8;
-            for(j = 0; j < 60; j++){
+            for(j = 0; j < 55; j++){
                 if(aliens[j].dead == 1)
                     continue;
 
                 aliens[j].sprite.anim = (aliens[j].sprite.anim + 1) % 2;
-                if(alienWidthMin < 8){
+                if(alienWidthMin < 40){
                     way = 1;
                     aliens[j].y += 8;
                 }
@@ -336,14 +385,14 @@ void update(int *i, int *f, int *a){
             }
         }
 
-        left = find_leftmost(12, 5, aliens);
+        left = find_leftmost(11, 5, aliens);
         if(left != -1){
             if(alienWidthMin < aliens[left].x){
                 alienWidthMin = aliens[left].x;
             }
         }
         
-        right = find_rightmost(12, 5, aliens);
+        right = find_rightmost(11, 5, aliens);
         if(right != -1){
             if(alienWidthMax > aliens[right].x){
                 alienWidthMax = aliens[right].x;
@@ -371,8 +420,8 @@ void update(int *i, int *f, int *a){
 
     // manage player movement & collision with aliens
     if(shoot == 1 && playerBullet.dead == 0) {
-        playerBullet.y-=5;
-        for(j = 0; j < 60; j++){
+        playerBullet.y-=7;
+        for(j = 0; j < 55; j++){
             if(aliens[j].dead == 0 && 
                 playerBullet.y > aliens[j].y &&
                 playerBullet.y < (aliens[j].y+8) && 
@@ -496,10 +545,25 @@ void update(int *i, int *f, int *a){
         break;
     }
 
+    switch(life){
+    case 0:
+        LifeTxt.sprite = Spr0;
+        break;
+    case 1:
+        LifeTxt.sprite = Spr1;
+        break;
+    case 2:
+        LifeTxt.sprite = Spr2;
+        break;
+    case 3:
+        LifeTxt.sprite = Spr3;
+        break;
+    }
+
     if(*a > 10 && alienBullet.dead == 1){
         r = alienWidthMin + rand() % alienWidthMax;
         *a = 0;
-        alienBullet.y = aliens[59].y;
+        alienBullet.y = aliens[54].y;
         alienBullet.dead = 0;
         alienBullet.x = r;
     }
@@ -541,7 +605,7 @@ void render(){
     if(player.dead == 0)
         draw_sprite_fast(player.x, player.y, &player.sprite);
 
-    for(i = 0; i < 60; i++){
+    for(i = 0; i < 55; i++){
         if(aliens[i].dead == 0)
             draw_sprite_fast(aliens[i].x, aliens[i].y, &aliens[i].sprite);
     }
@@ -555,6 +619,13 @@ void render(){
     if(alienBullet.dead == 0){
         draw_square(alienBullet.x, alienBullet.y, 1, 4, 2);
     }
+
+    for(i = 0; i < 4; i++){
+        draw_sprite_fast(defense[i].x, defense[i].y, &defense[i].sprite);
+    }
+
+    draw_sprite_fast(playerLife.x, playerLife.y, &playerLife.sprite);
+    draw_sprite_fast(LifeTxt.x, LifeTxt.y, &LifeTxt.sprite);
 
     
     _fmemcpy(CGA,buffer,0x4000);
